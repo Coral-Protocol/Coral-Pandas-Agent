@@ -15,7 +15,14 @@ registry:
         description: "API key for the service"
     runtime:
       type: "executable"
+
+      # For Linux or macOS, use the following command:
+      #export PROJECT_DIR=path/to/your/project
       command: ["bash", "-c", "${PROJECT_DIR}/run_agent.sh langchain-pandas-agent.py"]
+
+      #for Windows, use the following command:
+      #$env:PROJECT_DIR = "path/to/your/project"
+      # command: ["powershell","-ExecutionPolicy", "Bypass", "-File", "${PROJECT_DIR}/run_agent.ps1","langchain-pandas-agent.py"]
       environment:
         - name: "API_KEY"
           from: "API_KEY"
