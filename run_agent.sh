@@ -14,54 +14,54 @@ PYTHON_SCRIPT="$1"
 SCRIPT_DIR=$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")
 PROJECT_DIR="$SCRIPT_DIR"
 
-python -c "
-import os
-import subprocess
-import sys
-import venv
+# Detect operating system
+OS=$(uname -s)
+case "$OS" in
+  Linux*|Darwin*) PLATFORM="unix" ;;
+  CYGWIN*|MINGW*|MSYS*) PLATFORM="windows" ;;
+  *) echo "Error: Unsupported OS: $OS" >&2; exit 1 ;;
+esac
 
-# Define paths
-project_dir = '$PROJECT_DIR'
-python_script = '$PYTHON_SCRIPT'
-venv_dir = os.path.join(project_dir, 'venv')
-venv_python = os.path.join(venv_dir, 'bin' if os.name != 'nt' else 'Scripts', 'python')
+# Set virtual environment paths
+if [ "$PLATFORM" = "windows" ]; then
+  VENV_DIR="$PROJECT_DIR/venv/Scripts"
+  VENV_PYTHON="$VENV_DIR/python.exe"
+  UV_EXEC="$VENV_DIR/uv.exe"
+  # Convert Unix-style path to Windows-style for Python script if needed
+  PYTHON_SCRIPT=$(echo "$PYTHON_SCRIPT" | sed 's|/|\\|g')
+else
+  VENV_DIR="$PROJECT_DIR/venv/bin"
+  VENV_PYTHON="$VENV_DIR/python"
+  UV_EXEC="$VENV_DIR/uv"
+fi
 
 # Validate Python script exists
-if not os.path.isfile(os.path.join(project_dir, python_script)):
-    print(f'Error: Python script {python_script} not found in {project_dir}', file=sys.stderr)
-    sys.exit(1)
+if [ ! -f "$PROJECT_DIR/$PYTHON_SCRIPT" ]; then
+  echo "Error: Python script $PYTHON_SCRIPT not found in $PROJECT_DIR" >&2
+  exit 1
+fi
 
 # Create virtual environment if it doesn't exist
-if not os.path.exists(venv_dir):
-    print('Creating virtual environment...')
-    venv.create(venv_dir, with_pip=True)
+if [ ! -d "$PROJECT_DIR/venv" ]; then
+  echo "Creating virtual environment in $PROJECT_DIR/venv..."
+  python3 -m venv "$PROJECT_DIR/venv" || { echo "Error: Failed to create virtual environment" >&2; exit 1; }
+fi
 
 # Check if uv is installed in the virtual environment
-try:
-    subprocess.run([venv_python, '-m', 'uv', '--version'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-except (FileNotFoundError, subprocess.CalledProcessError):
-    print('Installing uv in virtual environment...')
-    try:
-        subprocess.run([venv_python, '-m', 'pip', 'install', 'uv'], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f'Error: Failed to install uv: {e}', file=sys.stderr)
-        sys.exit(1)
+if ! "$VENV_PYTHON" -m uv --version >/dev/null 2>&1; then
+  echo "Installing uv in virtual environment..."
+  "$VENV_PYTHON" -m pip install uv || { echo "Error: Failed to install uv" >&2; exit 1; }
+fi
 
 # Change to project directory
-try:
-    os.chdir(project_dir)
-except OSError as e:
-    print(f'Error: Could not change to directory {project_dir}: {e}', file=sys.stderr)
-    sys.exit(1)
+cd "$PROJECT_DIR" || { echo "Error: Could not change to directory $PROJECT_DIR" >&2; exit 1; }
 
-# Run uv sync and then uv run for the specified script
-try:
-    subprocess.run([venv_python, '-m', 'uv', 'sync'], check=True)
-    subprocess.run([venv_python, '-m', 'uv', 'run', python_script], check=True)
-except FileNotFoundError:
-    print('Error: \"uv\" not found even after installation attempt.', file=sys.stderr)
-    sys.exit(1)
-except subprocess.CalledProcessError as e:
-    print(f'Error: Command failed: {e}', file=sys.stderr)
-    sys.exit(1)
-"
+# Run uv sync
+echo "Running uv sync in $PROJECT_DIR..."
+"$VENV_PYTHON" -m uv sync || { echo "Error: uv sync failed" >&2; exit 1; }
+
+# Run the Python script with uv
+echo "Running $PYTHON_SCRIPT..."
+"$VENV_PYTHON" -m uv run "$PYTHON_SCRIPT" || { echo "Error: Failed to run $PYTHON_SCRIPT" >&2; exit 1; }
+
+echo "Script executed successfully."
