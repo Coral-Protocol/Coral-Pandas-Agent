@@ -1,0 +1,25 @@
+applications:
+  - id: "app"
+    name: "Default Application"
+    description: "Default application for testing"
+    privacyKeys:
+      - "default-key"
+      - "public"
+      - "priv"
+
+registry:
+  langchain-pandas:
+    options:
+      - name: "API_KEY"
+        type: "string"
+        description: "API key for the service"
+    runtime:
+      type: "executable"
+      command: ["bash", "-c", "${PROJECT_DIR}/run_agent.sh langchain-pandas-agent.py"]
+      environment:
+        - name: "API_KEY"
+          from: "API_KEY"
+        - name: "MODEL"
+          value: "gpt-4.1"
+        - name: "LLM_MODEL_PROVIDER"
+          value: "openai"
