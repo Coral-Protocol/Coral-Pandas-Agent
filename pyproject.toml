@@ -3,6 +3,7 @@ name = "vultr-track"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
+    "uv",
     "langchain==0.3.25",
     "langchain-community==0.3.24",
     "langchain-experimental==0.3.4",

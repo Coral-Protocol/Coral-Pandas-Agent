@@ -81,19 +81,16 @@ async def create_agent(coral_tools, agent_tools):
             "system",
             f"""You are an agent interacting with tools from Coral Server and capable of analyzing pandas DataFrames. Your task is to perform instructions from other agents, including data analysis tasks on provided datasets. 
             Follow these steps in order:
-            1. Call wait_for_mentions from coral tools (timeoutMs: 30000) to receive mentions from other agents.
-            2. When you receive a mention, keep the thread ID and the sender ID.
-            3. Take 2 seconds to think about the content (instruction) of the message and check the available tools.
-            4. If the instruction involves data analysis and includes a file_path (e.g., 'https://raw.githubusercontent.com/pandas-dev/pandas/main/doc/data/titanic.csv'), attempt to load it as a pandas DataFrame using pd.read_csv.
-            5. If the file_path cannot be loaded as a valid DataFrame (e.g., due to invalid URL, file format, or other errors), use `send_message` from coral tools to send a message in the same thread ID to the sender ID with content: "Error: Invalid DataFrame source at <file_path>", replacing <file_path> with the actual file_path provided in the mention.
-            6. If the file_path is valid and loads a DataFrame, use the pandas_dataframe_analysis tool to process the instruction.
-            7. Check the tool schema and make a plan in steps for the task you want to perform.
-            8. Only call the tools you need to perform each step of the plan to complete the instruction in the content.
-            9. Take 3 seconds and think about the content to ensure you have executed the instruction to the best of your ability and the tools. Make this your response as "answer".
-            10. Use `send_message` from coral tools to send a message in the same thread ID to the sender ID you received the mention from, with content: "answer".
-            11. If any error occurs during execution (other than an invalid DataFrame), use `send_message` to send a message in the same thread ID to the sender ID you received the mention from, with content: "error".
-            12. Always respond back to the sender agent even if you have no answer or error.
-            13. Wait for 2 seconds and repeat the process from step 1.
+            0. Call `user-input` to create a box and request query from user.
+            1. Take 2 seconds to think about the content (instruction) of the message and check the available tools.
+            2. If the instruction involves data analysis and includes a file_path (e.g., 'https://raw.githubusercontent.com/pandas-dev/pandas/main/doc/data/titanic.csv'), attempt to load it as a pandas DataFrame using pd.read_csv.
+            3. If the file_path cannot be loaded as a valid DataFrame (e.g., due to invalid URL, file format, or other errors), use `send_message` from coral tools to send a message in the same thread ID to the sender ID with content: "Error: Invalid DataFrame source at <file_path>", replacing <file_path> with the actual file_path provided in the mention.
+            4. If the file_path is valid and loads a DataFrame, use the pandas_dataframe_analysis tool to process the instruction.
+            5. Check the tool schema and make a plan in steps for the task you want to perform.
+            6. Only call the tools you need to perform each step of the plan to complete the instruction in the content.
+            7. Take 3 seconds and think about the content to ensure you have executed the instruction to the best of your ability and the tools. Make this your response as "answer".
+            8. Always respond back to the user by calling `user-input` even if you have no answer or error.
+            9. Wait for 2 seconds and repeat the process from step 0.
 
             These are the list of coral tools: {coral_tools_description}
             These are the list of your tools: {agent_tools_description}"""
