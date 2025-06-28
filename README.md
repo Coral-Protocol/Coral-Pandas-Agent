@@ -13,6 +13,53 @@ The Coral Pandas Agent's main responsibility is to interpret natural language in
 - **Date added**: June 27, 2025
 - **License**: MIT
 
+## Use the Agent in Orchestration
+
+### 1. Executable Agent Definition
+
+<details>
+
+For Linux or MAC:
+
+```bash
+# PROJECT_DIR="/PATH/TO/YOUR/PROJECT"
+
+applications:
+  - id: "app"
+    name: "Default Application"
+    description: "Default application for testing"
+    privacyKeys:
+      - "default-key"
+      - "public"
+      - "priv"
+
+registry:
+  interface:
+    options:
+      - name: "API_KEY"
+        type: "string"
+        description: "API key for the service"
+    runtime:
+      type: "executable"
+      command: ["bash", "-c", "${PROJECT_DIR}/run_agent.sh main.py"]
+      
+      environment:
+        - name: "API_KEY"
+          from: "API_KEY"
+        - name: "MODEL"
+          value: "gpt-4.1"
+        - name: "LLM_MODEL_PROVIDER"
+          value: "openai"
+```
+
+For Windows, create a powershell command and run:
+
+```bash
+command: ["powershell","-ExecutionPolicy", "Bypass", "-File", "${PROJECT_DIR}/run_agent.ps1","main.py"]
+```
+
+</details>
+
 
 ## Use the Agent in Dev Mode
 
@@ -61,7 +108,7 @@ cp -r .env_sample .env
 
 ```bash
 # Run the agent using `uv`:
-uv run python langchain-pandas-agent.py
+uv run python main.py
 ```
 </details>
 
