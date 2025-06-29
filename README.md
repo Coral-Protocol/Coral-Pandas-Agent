@@ -126,10 +126,10 @@ uv run python main.py
 
 ```bash
 # Input:
-Agent: How can I assist you today?
+For https://raw.githubusercontent.com/pandas-dev/pandas/main/doc/data/titanic.csv how describe me the columns"
 
 #Output:
-The agent will interact with you directly in the console and coordinate with other agents as needed.
+The agent will respond back with the column description.
 ```
 </details>
 
