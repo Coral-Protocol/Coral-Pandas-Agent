@@ -76,7 +76,7 @@ applications:
       - "priv"
 
 registry:
-  interface:
+  pandas:
     options:
       - name: "API_KEY"
         type: "string"
