@@ -16,8 +16,8 @@ async def create_pandas_agent(file_path: str, prompt: str):
         df = pd.read_csv(file_path)
         agent = create_pandas_dataframe_agent(
             llm=init_chat_model(
-                model=os.getenv("MODEL"),
-                model_provider=os.getenv("LLM_MODEL_PROVIDER"),
+                model=os.getenv("MODEL_NAME"),
+                model_provider=os.getenv("MODEL_PROVIDER"),
                 api_key=os.getenv("API_KEY"),
                 temperature=0.3,
                 max_tokens=32768
