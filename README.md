@@ -2,6 +2,8 @@
  
 Coral Pandas Agent interacts with other agents and performs data analysis on pandas DataFrames to fulfill user requests.
 
+![Agentimage](https://github.com/Coral-Protocol/awesome-agents-for-multi-agent-systems/blob/main/images/Coral-Pandas-Agent.png)
+
 ## Responsibility
 
 The Coral Pandas Agent's main responsibility is to interpret natural language instructions from users or other agents and translate them into actionable pandas DataFrame operations. It collaborates with other agents by fulfilling delegated data-related requests and delivers clear, concise insights or results to the requester.
