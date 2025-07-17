@@ -16,18 +16,7 @@ import traceback
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_dotenv()
 
-base_url = os.getenv("CORAL_SSE_URL")
-agentID = os.getenv("CORAL_AGENT_ID")
-
-coral_params = {
-    "agentId": agentID,
-    "agentDescription": "An agent that interacts with other agents and performs data analysis on pandas DataFrames to fulfill user requests."
-}
-
-query_string = urllib.parse.urlencode(coral_params)
 
 from pydantic import BaseModel, Field
 class AgentArgs(BaseModel):
@@ -113,6 +102,24 @@ async def create_agent(coral_tools, agent_tools):
     return AgentExecutor(agent=agent, tools=combined_tools, verbose=True)
 
 async def main():
+
+    runtime = os.getenv("CORAL_ORCHESTRATION_RUNTIME", "devmode")
+
+    if runtime == "docker" or runtime == "executable":
+        base_url = os.getenv("CORAL_SSE_URL")
+        agentID = os.getenv("CORAL_AGENT_ID")
+    else:
+        load_dotenv()
+        base_url = os.getenv("CORAL_SSE_URL")
+        agentID = os.getenv("CORAL_AGENT_ID")
+
+    coral_params = {
+        "agentId": agentID,
+        "agentDescription": "An agent that takes the user's input and interacts with other agents to fulfill the request"
+    }
+
+    query_string = urllib.parse.urlencode(coral_params)
+
     CORAL_SERVER_URL = f"{base_url}?{query_string}"
     logger.info(f"Connecting to Coral Server: {CORAL_SERVER_URL}")
 
