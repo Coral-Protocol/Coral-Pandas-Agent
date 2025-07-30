@@ -16,6 +16,7 @@ import traceback
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Load environment variables
 
 
 from pydantic import BaseModel, Field
@@ -94,24 +95,21 @@ async def create_agent(coral_tools, agent_tools):
     model = init_chat_model(
         model=os.getenv("MODEL_NAME", "gpt-4.1"),
         model_provider=os.getenv("MODEL_PROVIDER", "openai"),
-        api_key=os.getenv("API_KEY"),
-        temperature=os.getenv("MODEL_TEMPERATURE", 0.3),
-        max_tokens=os.getenv("MODEL_TOKEN", 8000),
+        api_key=os.getenv("MODEL_API_KEY"),
+        temperature=os.getenv("MODEL_TEMPERATURE", "0.1"),
+        max_tokens=os.getenv("MODEL_MAX_TOKENS", "8000"),
+        base_url=os.getenv("MODEL_BASE_URL", None)
     )
     agent = create_tool_calling_agent(model, combined_tools, prompt)
-    return AgentExecutor(agent=agent, tools=combined_tools, verbose=True)
+    return AgentExecutor(agent=agent, tools=combined_tools, verbose=True, handle_parsing_errors=True)
 
 async def main():
-
-    runtime = os.getenv("CORAL_ORCHESTRATION_RUNTIME", "devmode")
-
-    if runtime == "docker" or runtime == "executable":
-        base_url = os.getenv("CORAL_SSE_URL")
-        agentID = os.getenv("CORAL_AGENT_ID")
-    else:
+    runtime = os.getenv("CORAL_ORCHESTRATION_RUNTIME", None)
+    if runtime is None:
         load_dotenv()
-        base_url = os.getenv("CORAL_SSE_URL")
-        agentID = os.getenv("CORAL_AGENT_ID")
+
+    base_url = os.getenv("CORAL_SSE_URL")
+    agentID = os.getenv("CORAL_AGENT_ID")
 
     coral_params = {
         "agentId": agentID,
@@ -119,17 +117,17 @@ async def main():
     }
 
     query_string = urllib.parse.urlencode(coral_params)
-
     CORAL_SERVER_URL = f"{base_url}?{query_string}"
     logger.info(f"Connecting to Coral Server: {CORAL_SERVER_URL}")
 
+    timeout = os.getenv("TIMEOUT_MS", 300)
     client = MultiServerMCPClient(
         connections={
             "coral": {
                 "transport": "sse",
                 "url": CORAL_SERVER_URL,
-                "timeout": 600,
-                "sse_read_timeout": 600,
+                "timeout": timeout,
+                "sse_read_timeout": timeout,
             }
         }
     )
