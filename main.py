@@ -113,7 +113,7 @@ async def main():
 
     coral_params = {
         "agentId": agentID,
-        "agentDescription": "An agent that takes the user's input and interacts with other agents to fulfill the request"
+        "agentDescription": "Pandas Agent interacts with other agents and performs data analysis on excel or csv or spreadsheets via the pandas DataFrames to fulfill user requests."
     }
 
     query_string = urllib.parse.urlencode(coral_params)
