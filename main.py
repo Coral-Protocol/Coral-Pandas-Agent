@@ -47,9 +47,10 @@ async def create_pandas_agent(file_path: str, prompt: str):
             llm=init_chat_model(
                 model=os.getenv("MODEL_NAME"),
                 model_provider=os.getenv("MODEL_PROVIDER"),
-                api_key=os.getenv("API_KEY"),
+                api_key=os.getenv("MODEL_API_KEY"),
                 temperature=os.getenv("MODEL_TEMPERATURE", 0.3),
-                max_tokens=os.getenv("MODEL_TOKEN", 8000),
+                max_tokens=os.getenv("MODEL_MAX_TOKENS", 8000),
+                base_url=os.getenv("MODEL_BASE_URL", None)
             ),
             df=df,
             verbose=True,
