@@ -138,7 +138,7 @@ uv run python main.py
 
 ```bash
 # Input:
-For https://raw.githubusercontent.com/pandas-dev/pandas/main/doc/data/titanic.csv how describe me the columns"
+For https://raw.githubusercontent.com/pandas-dev/pandas/main/doc/data/titanic.csv describe me the columns and then find me number of women survivors"
 
 #Output:
 The agent will respond back with the column description.
